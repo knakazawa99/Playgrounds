@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  gitea:
+    image: gitea/gitea
+    container_name: gitea
+    volumes:
+      - ./data/gitea:/data
+    ports:
+      - "13000:3000"
+      - "10022:10022"
+    environment:
+      DB_TYPE: mysql
+      DB_HOST: gitea-db:3306
+      DB_NAME: gitea
+      DB_USER: gitea
+      DB_PASSWD: gitea
+      SSH_PORT: 10022
+      TZ: Asia/Tokyo
+    depends_on:
+      - gitea-db
+    restart: always
+  gitea-db:
+    image: mariadb
+    container_name: gitea-db
+    ports: []
+    environment:
+      MYSQL_ROOT_PASSWORD: gitea
+      MYSQL_DATABASE: gitea
+      MYSQL_USER: gitea
+      MYSQL_PASSWORD: gitea
+      TZ: Asia/Tokyo
+    volumes:
+      - ./data/db:/var/lib/mysql
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_bin
+    restart: always
