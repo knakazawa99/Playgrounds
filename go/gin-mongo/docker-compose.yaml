@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    container_name: smart-annotator
+    volumes:
+      - ./:/code
+    tty: true
+    build: .
+    ports:
+      - 3000:3000
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+      - ./configdb:/data/configdb
