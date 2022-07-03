@@ -1,0 +1,44 @@
+version: '3.5'
+services:
+  prometheus:
+    image: prom/prometheus:v2.28.1
+    container_name: prometheus
+    hostname: prometheus
+    volumes:
+      - ./prometheus/etc/prometheus:/etc/prometheus
+      - ./prometheus/data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+    ports:
+      - "9090:9090"
+    user: root
+    restart: always
+  node-exporter:
+    image: prom/node-exporter:v1.2.2
+    container_name: node-exporter
+    ports:
+      - "9100:9100"
+    restart: always
+  grafana:
+    image: grafana/grafana:8.1.0
+    container_name: grafana
+    hostname: grafana
+    volumes:
+      - /data/docker/containers/grafana/data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    user: root
+    env_file:
+      - /data/docker/containers/grafana/grafana.env
+    restart: always
+  alertmanager:
+    image: prom/alertmanager:v0.22.2
+    container_name: alertmanager
+    hostname: alertmanager
+    volumes:
+      - /data/docker/containers/alertmanager/etc/alertmanager:/etc/alertmanager
+    command:
+      - "--config.file=/etc/alertmanager/config.yaml"
+    ports:
+      - "9093:9093"
+    restart: always
