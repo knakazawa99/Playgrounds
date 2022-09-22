@@ -1,0 +1,7 @@
+*.cpyc
+*.DS_Store
+*__pycache__
+.env
+.coverage
+.python-version
+.idea
