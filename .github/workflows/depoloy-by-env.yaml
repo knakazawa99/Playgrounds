@@ -70,10 +70,3 @@ jobs:
         run: |
           echo ${{ steps.get_aws_region.outputs.result }}
           echo ${{ steps.get_aws_role.outputs.result }}
-
-
-  deploy-to-service2:
-    needs: create-update-tag
-    runs-on: ubuntu-latest
-
-    if: ${{github.event.inputs.servic}} != 'beacon'
