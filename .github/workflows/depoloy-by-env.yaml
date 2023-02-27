@@ -8,8 +8,8 @@ on:
         description: 'target service'
         required: true
         options:
-          - service1
-          - service2
+          - service-a
+          - service-b
       env:
         type: choice
         description: 'target env'
@@ -18,22 +18,42 @@ on:
           - dev
           - stg
           - prd
+      version-up-type:
+        type: choice
+        description: 'version up type'
+        default: patch
+        options:
+          - patch
+          - minor
+          - major
 
 jobs:
   create-update-tag:
     runs-on: ubuntu-latest
     outputs:
-      TARGET_SERVICES: ${{ steps.generate_git_tag.outputs.GENERATED_GIT_TAG }}
+      TARGET_SERVICES: ${{ steps.get_newest_tag.outputs.GENERATED_GIT_TAG }}
     steps:
       - uses: actions/checkout@v3
 
       - name: Get Newest Tag
-        id: generate_git_tag
+        id: get_newest_tag
         run: |
           echo ${{ github.event.inputs.env }}-${{ github.event.inputs.service }}
           GIT_TAG=$(git tag --sort -authordate | grep "${{ github.event.inputs.env }}"-"${{ github.event.inputs.service }}" | head -n 1)
           echo $GIT_TAG
-          echo "::set-output name=$GENERATED_GIT_TAG::$(echo $GIT_TAG)"
+          echo "GENERATED_GIT_TAG=$(echo $GIT_TAG)" >> $GITHUB_OUTPUT
+        shell: bash
+      - name: generage
+        id: generate_new_tag
+        uses: ./.github/actions/increment-git-tag
+        with:
+          version-type: ${{ inputs.version-up-type }}
+          git-tag: ${{ steps.get_newest_tag.outputs.GENERATED_GIT_TAG }}
+      - name: echo output
+        run: |
+          echo "New Version!"
+          echo ${{ steps.generate_new_tag.outputs.result }}
+
 
     #  - uses: rickstaa/action-create-tag@v1.3
     #    with:
